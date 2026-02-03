@@ -1,57 +1,53 @@
 PLATEFORME DE MONITORING (JAVASCRIPT-UDP)
-Ce projet consiste à réaliser un mini système IoT de surveillance environnementale permettant de mesurer et consulter à distance des données physiques à l’aide d’une carte Arduino Uno.
-L’Arduino est connecté à un capteur de distance HC-SR04 pour la détection d’obstacles ou de mouvements, ainsi qu’à un capteur DHT11 pour la mesure de la température et de l’humidité.
-Les données collectées par les capteurs sont transmises à un serveur IoT, qui communique avec un client via le protocole UDP.
-Grâce à une plateforme de connexion, le client peut interroger le système et afficher en temps réel les informations renvoyées par les capteurs.
+Ce projet consiste Ã  rÃ©aliser un mini systÃ¨me IoT de surveillance environnementale permettant de mesurer et consulter Ã  distance des donnÃ©es physiques Ã  lâ€™aide dâ€™une carte Arduino Uno.
+Lâ€™Arduino est connectÃ© Ã  un capteur de distance HC-SR04 pour la dÃ©tection dâ€™obstacles ou de mouvements, ainsi quâ€™Ã  un capteur DHT11 pour la mesure de la tempÃ©rature et de lâ€™humiditÃ©.
+Les donnÃ©es collectÃ©es par les capteurs sont transmises Ã  un serveur IoT, qui communique avec un client via le protocole UDP.
+GrÃ¢ce Ã  une plateforme de connexion, le client peut interroger le systÃ¨me et afficher en temps rÃ©el les informations renvoyÃ©es par les capteurs.
 
-Procédure d’exécution du projet
+ProcÃ©dure dâ€™exÃ©cution du projet
 
-Pour exécuter correctement la plateforme de monitoring IoT, les étapes suivantes doivent être respectées :
+Pour exÃ©cuter correctement la plateforme de monitoring IoT, les Ã©tapes suivantes doivent Ãªtre respectÃ©es :
 Lancement du serveur
-•	Ouvrir l’invite de commande (CMD ou PowerShell).
-•	Se placer dans le répertoire du projet contenant le fichier server.js :
+â€¢	Ouvrir lâ€™invite de commande (CMD ou PowerShell).
+â€¢	Se placer dans le rÃ©pertoire du projet contenant le fichier server.js :
 cd chemin/vers/le/projet
-•	Lancer le serveur avec la commande :
+â€¢	Lancer le serveur avec la commande :
 node server.js
-Si tout est correct, le serveur démarre et devient accessible sur le port 3000.
+Si tout est correct, le serveur dÃ©marre et devient accessible sur le port 3000.
 ________________________________________
 
-Accès à la plateforme
-?? En local (même machine)
+AccÃ¨s Ã  la plateforme
+?? En local (mÃªme machine)
 Dans le navigateur, saisir :
 http://localhost:3000/login
 
-?? Sur le réseau local (autre ordinateur ou téléphone)
+?? Sur le rÃ©seau local (autre ordinateur ou tÃ©lÃ©phone)
 Dans le navigateur, saisir :
 http://192.168.252.67:3000/login
-(ou l’adresse IP locale de la machine hébergeant le serveur).
-L’appareil client doit être connecté au même réseau Wi-Fi que la machine serveur.
+(ou lâ€™adresse IP locale de la machine hÃ©bergeant le serveur).
+Lâ€™appareil client doit Ãªtre connectÃ© au mÃªme rÃ©seau Wi-Fi que la machine serveur.
 ________________________________________
 
 Authentification
-Une page de connexion s’affiche.
-L’utilisateur doit entrer le mot de passe :
+Une page de connexion sâ€™affiche.
+Lâ€™utilisateur doit entrer le mot de passe :
 admin123
-Ce mot de passe est vérifié côté serveur grâce à :
-•	une requête POST
-•	un système de hashage avec bcrypt
-•	une gestion de sessions (express-session)
-Si le mot de passe est correct, l’utilisateur est redirigé vers :
+Ce mot de passe est vÃ©rifiÃ© cÃ´tÃ© serveur grÃ¢ce Ã  :
+â€¢	une requÃªte POST
+â€¢	un systÃ¨me de hashage avec bcrypt
+â€¢	une gestion de sessions (express-session)
+Si le mot de passe est correct, lâ€™utilisateur est redirigÃ© vers :
 /monitoring
 ________________________________________
 
 Fonctionnement de la plateforme
-Une fois connecté :
-•	Le navigateur établit une connexion WebSocket avec le serveur.
-•	Le serveur récupère les données envoyées par l’Arduino via le port série (COM3).
-•	Les données sont transmises en temps réel au client au format JSON.
-•	L’interface affiche :
-o	les valeurs numériques (distance, température, humidité),
+Une fois connectÃ© :
+â€¢	Le navigateur Ã©tablit une connexion WebSocket avec le serveur.
+â€¢	Le serveur rÃ©cupÃ¨re les donnÃ©es envoyÃ©es par lâ€™Arduino via le port sÃ©rie (COM3).
+â€¢	Les donnÃ©es sont transmises en temps rÃ©el au client au format JSON.
+â€¢	Lâ€™interface affiche :
+o	les valeurs numÃ©riques (distance, tempÃ©rature, humiditÃ©),
 o	un graphique dynamique (Chart.js),
 o	des jauges visuelles,
-o	une alerte sonore en cas de distance critique.
-________________________________________
-
-?? Résumé du fonctionnement global
-Capteurs ? Arduino ? Liaison série ? Serveur Node.js ? WebSocket ? Interface Web ? Affichage temps réel
+o	une alerte sonore en cas de distance critique.
 
