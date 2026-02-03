@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Plateforme de Monitoring</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #0f172a;
+      color: white;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .card {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .value {
+      font-size: 36px;
+      font-weight: bold;
+    }
+
+    .chart-zone {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 30px 0;
+    }
+
+    .gauges {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .gauge {
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      font-size: 20px;
+      transition: background 0.5s;
+    }
+
+    .gauge-box {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.vertical-gauge {
+  position: relative;
+  height: 200px;
+  width: 40px;
+  margin: 20px auto;
+  background: #020617;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.temp-gauge {
+  position: relative;
+  height: 240px;
+  width: 60px;
+  margin: auto;
+  background: #020617;
+  border-radius: 30px;
+  overflow: hidden;
+}
+
+.zones {
+  position: absolute;
+  inset: 0;
+}
+
+.zone {
+  width: 100%;
+}
+
+.zone.danger { height: 30%; background: #7f1d1d; }
+.zone.warn   { height: 25%; background: #78350f; }
+.zone.safe   { height: 45%; background: #14532d; }
+
+.temp-fill {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 0%;
+  background: #22c55e;
+  transition: height 0.6s ease, background 0.5s;
+  z-index: 2;
+}
+
+.marks {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+.marks span {
+  position: absolute;
+  left: 70px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+#tempStatus {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.gauge-fill {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 0%;
+  background: green;
+  transition: height 0.5s, background 0.5s;
+}
+
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 30px 0;
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .start { background: #16a34a; color: white; }
+    .stop { background: #dc2626; color: white; }
+    .reset { background: #2563eb; color: white; }
+
+    footer {
+      text-align: center;
+      opacity: 0.6;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <header>
+    <h1>Plateforme de Monitoring IoT</h1>
+    <p>Distance, Température et Humidité en temps réel</p>
+  </header>
+
+  <!-- VALEURS -->
+  <section class="cards">
+    <div class="card">
+      <h3>Distance</h3>
+      <div class="value"><span id="distance">00</span> cm</div>
+      <audio id="alertSound"><source src="alert.mp3" type="audio/mpeg"></audio>
+    </div>
+
+    <div class="card">
+      <h3>Température</h3>
+      <div class="value"><span id="temperature">00</span> °C</div>
+    </div>
+
+    <div class="card">
+      <h3>Humidité</h3>
+      <div class="value"><span id="humidite">00</span> %</div>
+    </div>
+  </section>
+
+  <!-- BOUTONS -->
+  <div class="controls">
+    <button class="start">Démarrer</button>
+    <button class="stop">Arrêter</button>
+    <button class="reset">Réinitialiser</button>
+  </div>
+
+  <!-- GRAPHE -->
+  <section class="chart-zone">
+    <h3>Évolution de la distance</h3>
+    <canvas id="distanceChart"></canvas>
+  </section>
+
+  <!-- JAUGES -->
+ <section class="gauges">
+  <div class="gauge-box">
+  <h3>Température</h3>
+
+  <div class="temp-gauge">
+    <div class="zones">
+      <div class="zone danger"></div>
+      <div class="zone warn"></div>
+      <div class="zone safe"></div>
+    </div>
+
+    <div id="tempFill" class="temp-fill"></div>
+
+    <div class="marks">
+      <span style="bottom:80%">50°C</span>
+      <span style="bottom:55%">35°C</span>
+      <span style="bottom:40%">28°C</span>
+      <span style="bottom:0%">0°C</span>
+    </div>
+  </div>
+
+  <p id="tempStatus">--</p>
+</div>
+
+
+  <div class="gauge-box">
+    <h3>Humidité</h3>
+    <div class="vertical-gauge">
+      <div id="humBar" class="gauge-fill"></div>
+    </div>
+    <p id="humStatus">--</p>
+  </div>
+</section>
+
+  <footer>
+    Plateforme de Monitoring © 2026
+  </footer>
+
+</div>
+
+<script>
+ 
+
+  let socket = null;
+  let running = false;
+
+  const distanceEl = document.getElementById("distance");
+  const temperatureEl = document.getElementById("temperature");
+  const humiditeEl = document.getElementById("humidite");
+ 
+
+  const startBtn = document.querySelector(".start");
+  const stopBtn = document.querySelector(".stop");
+  const resetBtn = document.querySelector(".reset");
+
+const tempBar = document.getElementById("tempFill");
+const humBar = document.getElementById("humBar");
+const tempStatus = document.getElementById("tempStatus");
+const humStatus = document.getElementById("humStatus");
+const DIST_MIN = 5;
+
+
+function updateGauge(bar, statusEl, value, max, zones) {
+  const percent = Math.min((value / max) * 100, 100);
+  bar.style.height = percent + "%";
+
+  if (value < zones.safe) {
+    bar.style.background = "#16a34a";
+    statusEl.textContent = "Zone sûre ✅";
+  } else if (value < zones.warn) {
+    bar.style.background = "#f59e0b";
+    statusEl.textContent = "Zone acceptable ⚠️";
+  } else {
+    bar.style.background = "#dc2626";
+    statusEl.textContent = "Zone DANGER ❌";
+  }
+}
+
+  // ===== GRAPHE =====
+  const chart = new Chart(
+    document.getElementById("distanceChart"),
+    {
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [{
+          label: "Distance (cm)",
+          data: [],
+          borderWidth: 2,
+          tension: 0.3
+        }]
+      },
+      options: {
+        animation: false,
+        scales: { x: { display: false } }
+      }
+    }
+  );
+
+  const TEMP_MAX = 35;
+  const HUM_MAX = 70;
+let alarmPlaying = false;
+
+function checkDistance(distance) {
+  const sound = document.getElementById("alertSound");
+
+  if (distance < DIST_MIN) {
+    if (!alarmPlaying) {
+      sound.loop = true;
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+      alarmPlaying = true;
+    }
+  } else {
+    if (alarmPlaying) {
+      sound.pause();
+      sound.currentTime = 0;
+      alarmPlaying = false;
+    }
+  }
+}
+
+  // ===== DÉMARRER =====
+  startBtn.onclick = () => {
+    if (running) return;
+
+   socket = new WebSocket(`ws://${location.host}`);
+
+    running = true;
+     socket.onopen = () => {
+  console.log("✅ WebSocket connecté");
+};
+
+socket.onerror = (err) => {
+  console.error("❌ Erreur WebSocket", err);
+};
+
+socket.onclose = () => {
+  console.warn("⚠️ WebSocket fermé");
+};
+    socket.onmessage = (event) => {
+      if (!running) return;
+
+      const data = JSON.parse(event.data);
+
+      distanceEl.textContent = data.distance.toFixed(1);
+      temperatureEl.textContent = data.temperature.toFixed(1);
+      humiditeEl.textContent = data.humidite.toFixed(1);
+
+      chart.data.labels.push("");
+      chart.data.datasets[0].data.push(data.distance);
+      if (chart.data.labels.length > 30) {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+      }
+      chart.update();
+
+      updateGauge(
+        humBar,
+        humStatus,
+        data.humidite,100,{ safe: 60, warn: 75 }
+      );
+
+      updateTemperature(data.temperature);
+      checkDistance(data.distance);
+
+
+      if (data.distance < DIST_MIN) {
+        distanceEl.style.color = "#dc2626";
+      } else {distanceEl.style.color = "#22c55e";
+    }
+
+
+    };
+  };
+
+  // ===== ARRÊTER =====
+  stopBtn.onclick = () => {
+    if (socket) socket.close();
+    running = false;
+  };
+
+  // ===== RÉINITIALISER =====
+  resetBtn.onclick = () => {
+      if (socket) socket.close();
+  window.location.href = "/logout";
+
+
+    distanceEl.textContent = "00";
+    temperatureEl.textContent = "00";
+    humiditeEl.textContent = "00";
+
+    chart.data.labels = [];
+    chart.data.datasets[0].data = [];
+    chart.update();
+
+    tempGauge.style.background = "#1e293b";
+    humGauge.style.background = "#1e293b";
+    tempGauge.textContent = "Température";
+    humGauge.textContent = "Humidité";
+  };
+function updateTemperature(temp) {
+  const fill = document.getElementById("tempFill");
+  const status = document.getElementById("tempStatus");
+
+  const percent = Math.min((temp / 50) * 100, 100);
+  fill.style.height = percent + "%";
+
+  if (temp < 28) {
+    fill.style.background = "#22c55e";
+    status.textContent = "Zone sure ✅";
+  } else if (temp < 35) {
+    fill.style.background = "#f59e0b";
+    status.textContent = "Zone acceptable ⚠️";
+  } else {
+    fill.style.background = "#dc2626";
+    status.textContent = "DANGER!!!❌";
+  }
+}
+
+
+</script>
+
+</body>
+</html>

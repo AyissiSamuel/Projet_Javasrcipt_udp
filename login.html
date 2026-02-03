@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Connexion</title>
+  <style>
+    body {
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial;
+    }
+    form {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 12px;
+      width: 300px;
+      text-align: center;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      border-radius: 8px;
+      border: none;
+    }
+    button {
+      background: #16a34a;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<form method="POST" action="/login">
+  <h2>Connexion 🔐</h2>
+  <input type="password" name="password" placeholder="Mot de passe" required>
+  <button>Se connecter</button>
+</form>
+
+</body>
+</html>
